@@ -40,6 +40,7 @@ define rbenv::plugin(
 
   exec { "rbenv::plugin::update ${user} ${plugin_name}":
     command => '/usr/bin/git pull',
+    unless  => '/usr/bin/git remote update && test $(/usr/bin/git rev-parse master) = $(/usr/bin/git rev-parse origin/master)',
     user    => $user,
     group   => $group,
     timeout => $timeout,

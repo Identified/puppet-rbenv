@@ -39,7 +39,7 @@ define rbenv::plugin(
   }
 
   exec { "rbenv::plugin::update ${user} ${plugin_name}":
-    command => 'git pull',
+    command => 'git fetch && git reset --hard origin/master',
     unless  => 'git remote update && test $(git rev-parse master) = $(git rev-parse origin/master)',
     user    => $user,
     group   => $group,

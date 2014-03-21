@@ -75,6 +75,7 @@ define rbenv::compile(
     environment => [ "HOME=${home_path}", "CONFIGURE_OPTS=${configure_opts}" ],
     creates     => "${versions}/${ruby}",
     path        => $path,
+    logoutput   => 'on_failure',
     require     => Rbenv::Plugin["rbenv::plugin::rubybuild::${user}"],
     before      => Exec["rbenv::rehash ${user} ${ruby}"],
   }
@@ -87,6 +88,7 @@ define rbenv::compile(
     onlyif      => "[ -e '${root_path}/.rehash' ]",
     environment => [ "HOME=${home_path}" ],
     path        => $path,
+    logoutput   => 'on_failure',
   }
 
   # Install bundler
@@ -105,7 +107,7 @@ define rbenv::compile(
   if $global {
     file { "rbenv::global ${user}":
       path    => $global_path,
-      content => "$ruby\n",
+      content => "${ruby}\n",
       owner   => $user,
       group   => $group,
       require => Exec["rbenv::compile ${user} ${ruby}"]

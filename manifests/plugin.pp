@@ -13,7 +13,7 @@ define rbenv::plugin(
   $plugins     = "${root_path}/plugins"
   $destination = "${plugins}/${plugin_name}"
 
-  if $source !~ /^git:/ {
+  if $source !~ /^(git|https):/ {
     fail('Only git plugins are supported')
   }
 
@@ -32,17 +32,18 @@ define rbenv::plugin(
     user    => $user,
     group   => $group,
     creates => $destination,
-    path    => ['/usr/bin', '/usr/sbin'],
+    path    => ['/bin', '/usr/bin', '/usr/sbin'],
     timeout => $timeout,
     cwd     => $home_path,
     require => File["rbenv::plugins ${user}"],
   }
 
   exec { "rbenv::plugin::update ${user} ${plugin_name}":
-    command => '/usr/bin/git pull',
-    unless  => '/usr/bin/git remote update && test $(/usr/bin/git rev-parse master) = $(/usr/bin/git rev-parse origin/master)',
+    command => 'git pull',
+    unless  => 'git remote update && test $(git rev-parse master) = $(git rev-parse origin/master)',
     user    => $user,
     group   => $group,
+    path    => ['/bin', '/usr/bin', '/usr/sbin'],
     timeout => $timeout,
     cwd     => $destination,
     require => Exec["rbenv::plugin::checkout ${user} ${plugin_name}"],
